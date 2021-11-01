@@ -1,49 +1,74 @@
+from decimal import *
 from columnar import columnar
 
+
+
 table_data = []
-table_header = ['Seitenlänge a in cm', 'Seitenlänge b in cm', 'Mittelwert (a,b) in cm']
+table_header = ['Nr.','Seitenlänge a in cm', 'Seitenlänge b in cm', 'Mittelwert (a,b) in cm']
 
-def print_senctence(data):
-    print('\n' * 1)
+def _line():
+    print('-' * 96)
+
+def _block():
+    print('\n' * 2)
+
+def _print(data):
+    _block()
     print(data)
-    print('\n' * 1)
+    _block()
 
-def calc_num_before_after():
+
+def calc_interval(root):
     for i in range(0, root):
         i1 = i + 1
         if (i1 * i1) > root:
             return (i, i1)
 
+
+
 def steps(number, total, root, before):
-    number = number + 1;
+    number += 1
 
     # Berechne Seitenlänge b in cm 
-    bValue = root / before
+    bValue = Decimal(root) / Decimal(before)
 
     # Berechne den Mittelwert (a,b) in cm
-    average = (bValue + before) / 2
+    average = (Decimal(bValue) + Decimal(before)) / Decimal(2)
 
-    table_data.append([str(number), str(bValue), str(average)])
+    # Füge die Werte zur Tabelle hinzu.
+    table_data.append([str(number), str(before), str(bValue), str(average)])
 
-    if (total <= number):
-        print(columnar(table_data, headers=table_header, no_borders=False))
-        print_senctence(f'Der Näherungswert für die Wurzel aus 17 beträgt {average}')
+    # Falls die maximale Anzahl Durchläufe erreicht ist oder Zahlen sich doppeln, 
+    # somit nicht genauer bestimmbar sind, gebe die Tabelle aus.  
+    if (total <= number or before == bValue):
+        _print(columnar(table_data, headers=table_header, no_borders=False))
+        _print(f'Der Näherungswert für die Wurzel aus {root} beträgt {average}')
 
+    # Falls nicht, gehe zum nächsten Durchlauf über.
     else:
         steps(number, total, root, average)
         
 
-def calc_num_root(left, root, before):
-    steps(0, 10, root, before + 0.1)
+def calc_root(total, root, before):
+    steps(0, total, root, before)
 
 
 
 
+_line()
 
+# Eingabefeld für die Zahl, die radiziert werden soll.
+root = input('Gib eine Zahl ein, die radiziert werden soll: ')
+root = int(root)
 
-root = 17
-(before, after) = calc_num_before_after()
+# Eingabefeld für die Anzahl der Durchläufe.
+loop = input('Wieviele Durchläufe soll es maximal geben? ')
+loop = int(loop)
 
-print_senctence(f'Die Wurzel aus {root} liegt zwischen {before} und {after}.')
+_line()
 
-calc_num_root(10, root, before)
+(before, after) = calc_interval(root)
+
+_print(f'Die Wurzel aus {root} liegt zwischen {before} und {after}.')
+
+calc_root(loop, root, before)
