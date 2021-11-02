@@ -1,1 +1,1 @@
-# helon-algorythm
+# heron-algorythm
